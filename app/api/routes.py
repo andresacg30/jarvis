@@ -8,6 +8,8 @@ from app.models import Conversation
 
 @bp.before_request
 def authenticate_request():
+    if request.method == "OPTIONS":
+        return
     api_key = request.headers.get('X-API-KEY')
     if not api_key:
         abort(401)
@@ -19,7 +21,9 @@ def authenticate_request():
 def initial_message():
     conversation = conversation_controller.create_conversation()
     last_message = message_controller.get_latest_message(conversation=conversation)
-    return jsonify({'user_id': conversation.user_id, 'text': last_message.content})
+    response = jsonify({'user_id': conversation.user_id, 'text': last_message.content})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 @bp.route('/chat', methods=["POST"])
