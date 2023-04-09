@@ -26,7 +26,7 @@ def get_latest_message(conversation: Conversation) -> Message:
         return
     latest_message = Message.query.filter_by(
         conversation_id=conversation.id
-    ).order_by(Message.created_at.desc()).first()
+    ).order_by(Message.id.desc()).first()
     if not latest_message.role == "assistant":
         raise ModelResponseError
 
