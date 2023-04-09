@@ -4,6 +4,7 @@ from app.api import bp
 from app.controllers import conversation as conversation_controller
 from app.controllers import message as message_controller
 from app.models import Conversation
+from app.utils import constants, security
 
 
 @bp.before_request
@@ -21,18 +22,32 @@ def authenticate_request():
 def initial_message():
     conversation = conversation_controller.create_conversation()
     last_message = message_controller.get_latest_message(conversation=conversation)
-    response = jsonify({'user_id': conversation.user_id, 'text': last_message.content})
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    payload = {
+        "user_id": conversation.user_id,
+    }
+    token = security.encode_jwt_tokens(
+        payload=payload,
+        days_before_expiration=constants.GUEST_USER_TOKEN_DAYS_BEFORE_EXPIRATION,
+        encryption_algorithm=constants.GUEST_USER_ENCRYPTATION,
+    )
+    response = jsonify({'token': token, 'text': last_message.content})
     return response
 
 
 @bp.route('/chat', methods=["POST"])
 def chat():
     data = request.get_json() or {}
-    user_id = data.get('user_id')
+    token = data.get('token')
     message = data.get('content')
-    if not user_id:
-        abort(400, "Missing user")
+    if not token:
+        abort(400, "Missing token")
+    try:
+        user_id = security.decode_jwt_tokens(
+            token=token,
+            encryption_algorithm=constants.GUEST_USER_ENCRYPTATION,
+        )
+    except (security.TokenError):
+        abort(401, "Invalid token")
     conversation = Conversation.query.filter_by(user_id=user_id).first()
     if not conversation:
         abort(404, "Conversation not found")
