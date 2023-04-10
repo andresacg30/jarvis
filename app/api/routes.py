@@ -1,4 +1,3 @@
-import typing
 from flask import Request, jsonify, request, abort, current_app
 
 from app.api import bp
@@ -28,7 +27,8 @@ def initial_message():
     token = security.encode_jwt_tokens(
         payload=payload,
         days_before_expiration=constants.GUEST_USER_TOKEN_DAYS_BEFORE_EXPIRATION,
-        encryption_algorithm=current_app.config["JWT_ALGORITHM"]
+        secret_key=current_app.config['JWT_KEY'],
+        encryption_algorithm=constants.JWT_ALGORITHM
     )
     response = jsonify({'token': token, 'text': last_message.content})
     return response
@@ -42,10 +42,12 @@ def chat():
     if not token:
         abort(400, "Missing token")
     try:
-        user_id = security.decode_jwt_tokens(
+        token = security.decode_jwt_tokens(
             token=token,
-            encryption_algorithm=current_app.config["JWT_ALGORITHM"]
+            secret_key=current_app.config['JWT_KEY'],
+            encryption_algorithm=constants.JWT_ALGORITHM
         )
+        user_id = token['user_id']
     except (security.TokenError):
         abort(401, "Invalid token")
     conversation = Conversation.query.filter_by(user_id=user_id).first()

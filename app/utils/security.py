@@ -1,7 +1,8 @@
 import jwt
 
 from datetime import datetime, timedelta
-from flask import current_app
+
+from app.utils import config
 
 
 class TokenError(Exception):
@@ -12,8 +13,9 @@ class TokenError(Exception):
 
 def encode_jwt_tokens(payload: dict,
                       days_before_expiration: int,
+                      secret_key: str,
                       encryption_algorithm: str) -> bytes:
-    key = current_app.config["SECRET_KEY"]
+    key = config.bytes_from_str(secret_key)
     expiration_date = _get_expiration_date(days_before_expiration)
     payload["exp"] = expiration_date
     encoded_token = jwt.encode(payload, key=key, algorithm=encryption_algorithm)
@@ -21,8 +23,9 @@ def encode_jwt_tokens(payload: dict,
 
 
 def decode_jwt_tokens(token: str,
+                      secret_key: str,
                       encryption_algorithm: str) -> dict:
-    key = current_app.config["SECRET_KEY"]
+    key = config.bytes_from_str(secret_key)
     try:
         decoded = jwt.decode(token, key=key, algorithms=encryption_algorithm)
     except jwt.DecodeError as e:

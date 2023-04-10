@@ -1,53 +1,87 @@
-def test__chat__returns_expected_message__when_has_valid_api_key(
+import base64
+
+from flask import current_app
+
+from app.utils import constants
+from app.utils import security
+
+
+def _build_jwt_token(expected_payload):
+    jwt_token = security.encode_jwt_tokens(
+        payload=expected_payload,
+        days_before_expiration=constants.GUEST_USER_TOKEN_DAYS_BEFORE_EXPIRATION,
+        secret_key=current_app.config['JWT_KEY'],
+        encryption_algorithm=constants.JWT_ALGORITHM,
+    )
+    return jwt_token
+
+
+def test__chat__returns_expected_message__when_has_valid_token(
     test_client,
     mocker,
-    api_key,
-    conversation_factory
+    conversation_factory,
 ):
-    headers = {'X-API-KEY': api_key}
     user_id = "test_user_id"
     conversation = conversation_factory(user_id)
     expected_model_response = "Bot response"
     model_response = {
         "choices": [{"message": {"content": expected_model_response}}]
     }
-    headers = {'X-API-KEY': api_key}
     mocker.patch('openai.ChatCompletion.create', return_value=model_response)
-    user_message = "Test message"
-
-    data = {
-        'user_id': user_id,
-        'content': user_message
-    }
-    response = test_client.post('/api/chat', json=data, headers=headers)
+    encoded_token = _build_jwt_token(
+        expected_payload={"user_id": conversation.user_id}
+    )
+    response = test_client.post(
+        '/api/chat',
+        json={'content': 'Test message', 'token': encoded_token},
+    )
     first_message = list(conversation.messages)[0].content
     last_message = list(conversation.messages)[-1].content
 
     assert response.status_code == 200
     assert response.json['text'] == expected_model_response
     assert len(conversation.messages.all()) == 2
-    assert first_message == user_message
+    assert first_message == 'Test message'
     assert last_message == expected_model_response
 
 
-def test__chat__returns_unauthorized_error__when_has_invalid_api_key(test_client, mocker):
-    api_key = 'invalid_api_key'
-    headers = {'X-API-KEY': api_key}
-    message = {'content': 'hello'}
-    mocker.patch('openai.ChatCompletion.create')
+def test__chat__returns_unauthorized_error__when_missing_token(
+    test_client,
+):
+    response = test_client.post(
+        '/api/chat',
+        json={'content': 'hello'},
+    )
 
-    response = test_client.post('/api/chat', json=message, headers=headers)
+    assert response.status_code == 400
+    assert response.json['message'] == 'Missing token'
 
-    assert response.status_code == 403
 
-
-def test__chat__returns_forbidden__when_has_invalid_api_key(test_client, mocker):
-    message = {'content': 'hello'}
-    mocker.patch('openai.ChatCompletion.create')
-
-    response = test_client.post('/api/chat', json=message)
+def test__chat__returns_unauthorized_error__when_invalid_token(
+    test_client,
+    jwt_token,
+):
+    headers = {'Authorization': f'Bearer {jwt_token}'}
+    invalid_token = jwt_token + 'invalid'
+    response = test_client.post(
+        '/api/chat',
+        json={'content': 'hello', 'token': invalid_token},
+        headers=headers,
+    )
 
     assert response.status_code == 401
+    assert response.json['message'] == 'Invalid token'
+
+def test__chat__returns_forbidden__when_token_not_provided(
+    test_client,
+):
+    response = test_client.post(
+        '/api/chat',
+        json={'content': 'hello'},
+    )
+
+    assert response.status_code == 403
+    assert response.json['message'] == 'Forbidden'
 
 
 def test__initial_message__returns_greetings_message(test_client, mocker, api_key):

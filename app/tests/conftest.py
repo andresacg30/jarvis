@@ -16,6 +16,7 @@ def test_app():
         API_KEY = "test"
         BOT_INITIAL_SETUP = "bot"
         BOT_INITIAL_SETUP = "This is for test purposes"
+        JWT_KEY = "test"
 
     flask_app = create_app(Config)
     flask_app.app_context().push()
