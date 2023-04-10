@@ -1,5 +1,3 @@
-import base64
-
 from flask import current_app
 
 from app.utils import constants
@@ -52,36 +50,21 @@ def test__chat__returns_unauthorized_error__when_missing_token(
         '/api/chat',
         json={'content': 'hello'},
     )
-
     assert response.status_code == 400
-    assert response.json['message'] == 'Missing token'
+    assert response.json['error'] == '400 Bad Request: Missing token'
 
 
 def test__chat__returns_unauthorized_error__when_invalid_token(
     test_client,
-    jwt_token,
 ):
-    headers = {'Authorization': f'Bearer {jwt_token}'}
-    invalid_token = jwt_token + 'invalid'
+    invalid_token = 'invalid_token'
     response = test_client.post(
         '/api/chat',
         json={'content': 'hello', 'token': invalid_token},
-        headers=headers,
     )
 
     assert response.status_code == 401
-    assert response.json['message'] == 'Invalid token'
-
-def test__chat__returns_forbidden__when_token_not_provided(
-    test_client,
-):
-    response = test_client.post(
-        '/api/chat',
-        json={'content': 'hello'},
-    )
-
-    assert response.status_code == 403
-    assert response.json['message'] == 'Forbidden'
+    assert response.json['error'] == '401 Unauthorized: Invalid token'
 
 
 def test__initial_message__returns_greetings_message(test_client, mocker, api_key):

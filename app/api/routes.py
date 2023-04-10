@@ -15,6 +15,21 @@ def _is_authenticated_get_request(request: Request) -> None:
         abort(401)
 
 
+@bp.errorhandler(400)
+def handle_bad_request_error(e):
+    return jsonify(error=str(e)), 400
+
+
+@bp.errorhandler(401)
+def handle_unauthorized_error(e):
+    return jsonify(error=str(e)), 401
+
+
+@bp.errorhandler(404)
+def handle_not_found_error(e):
+    return jsonify(error=str(e)), 404
+
+
 @bp.route('/chat/initial', methods=['GET'])
 def initial_message():
     _is_authenticated_get_request(request=request)
