@@ -1,3 +1,5 @@
+import typing
+
 from flask import current_app
 
 from app import db
@@ -29,7 +31,10 @@ def create_conversation(user: User = None) -> Conversation:
     return conversation
 
 
-def chat(conversation, message) -> Conversation:
+def chat(
+    conversation,
+    message: typing.Optional[Message]
+) -> Conversation:
     conversation.add_message(role="user", content=message)
     model_response = get_model_response(messages=conversation.messages)
     conversation.add_message(role="assistant", content=model_response)
