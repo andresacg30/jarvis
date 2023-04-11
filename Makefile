@@ -9,6 +9,18 @@ init_db:
 	flask db migrate
 	flask db upgrade
 
+.PHONY: build
+build:
+	docker build -t microblog:latest .
+
 .PHONY: run
 run:
-	flask run --host=0.0.0.0 --port=8000
+	docker-compose --env-file .env up -d --build
+
+.PHONY: stop
+stop:
+	docker-compose stop
+
+.PHONY: restart
+restart: down build up
+
