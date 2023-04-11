@@ -1,2 +1,2 @@
-FLASK_APP=chatbot.py
+FLASK_APP=jarvis.py
 FLASK_DEBUG=FALSE

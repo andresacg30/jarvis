@@ -1,0 +1,49 @@
+version: "3"
+services:
+  jarvis:
+    image: jarvis
+    container_name: jarvis
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: jarvis
+    ports:
+      - 8000:8000
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - API_KEY=${API_KEY}
+      - BOT_INITIAL_SETUP=${BOT_INITIAL_SETUP}
+      - JWT_KEY=${JWT_KEY}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+    links:
+      - database
+    volumes:
+      - app_sourcecode:/jarvis
+    restart: always
+    networks:
+     - jarvis-network
+
+  database:
+    container_name: ultron
+    image: postgres:14
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+     - jarvis-network
+
+networks:
+  jarvis-network:
+
+volumes:
+  db_data:
+  app_sourcecode:
+    driver_opts:
+      type: none
+      device: $PWD
+      o: bind
