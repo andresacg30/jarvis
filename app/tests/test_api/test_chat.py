@@ -43,7 +43,7 @@ def test__chat__returns_expected_message__when_has_valid_token(
     assert last_message == expected_model_response
 
 
-def test__chat__returns_unauthorized_error__when_missing_token(
+def test__chat__returns_bad_request_error__when_missing_token(
     test_client,
 ):
     response = test_client.post(
