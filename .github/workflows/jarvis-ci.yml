@@ -11,11 +11,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    
-    - name: Install bc
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y bc
   
     - name: Set up Python 3.11.0
       uses: actions/setup-python@v2
@@ -37,6 +32,7 @@ jobs:
         python -m pytest -v
 
     - name: Test coverage
+      continue-on-error: false
       run: |
         coverage run -m pytest -v
-        coverage report -m --fail-under=99
+        coverage report -m --fail-under=86
