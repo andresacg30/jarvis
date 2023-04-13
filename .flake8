@@ -15,6 +15,8 @@ exclude =
     dist,
     # Alembic files
     migrations/*
+    # libraries
+    .venv/*
 max-complexity = 10
 per-file-ignores =
     # imported but unused
