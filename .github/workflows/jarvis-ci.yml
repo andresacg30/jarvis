@@ -1,7 +1,6 @@
 name: jarvis-ci
 
 on:
-
   pull_request:
     branches:
     - "**"
@@ -13,6 +12,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     
+    - name: Install bc
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc
+  
     - name: Set up Python 3.11.0
       uses: actions/setup-python@v2
       with:
@@ -34,3 +38,11 @@ jobs:
       run: |
         coverage run -m pytest -v
         coverage report -m
+
+    - name: Check coverage percentage
+      run: |
+        coverage_percentage=$(coverage report | grep TOTAL | awk '{print $NF}')
+        if (( $(echo "$coverage_percentage < 99" | bc -l) )); then
+          echo "Test coverage below 85%: $coverage_percentage%"
+          exit 1
+        fi
