@@ -32,4 +32,4 @@ jobs:
     - name: Test coverage
       run: |
         coverage run -m pytest -v
-        coverage report -m --fail-under=86
+        coverage report -m --fail-under=99
