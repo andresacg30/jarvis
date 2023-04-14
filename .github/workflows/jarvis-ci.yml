@@ -22,17 +22,14 @@ jobs:
         pip install -r requirements.txt
 
     - name: Lint with flake8
-      continue-on-error: false
       run: |
         flake8 . --show-source --statistics
         
     - name: Test with pytest
-      continue-on-error: false
       run: |
         python -m pytest -v
 
     - name: Test coverage
-      continue-on-error: false
       run: |
         coverage run -m pytest -v
         coverage report -m --fail-under=86
