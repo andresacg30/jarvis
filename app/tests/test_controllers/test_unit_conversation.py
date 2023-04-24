@@ -1,4 +1,5 @@
 import app.controllers.conversation as conversation_controller
+import app.controllers.message as message_controller
 
 
 def test__create_conversation__returns_conversation_with_chat_response__when_user_is_guest(
@@ -6,19 +7,23 @@ def test__create_conversation__returns_conversation_with_chat_response__when_use
     mocker
 ):
     with test_app.app_context():
+        initial_messages = [
+        "Hello! How can I assist you with ALCA's AI solutions today?",
+        "Hello! How may I assist you with our AI solutions for business?",
+        "Hello! Welcome to ALCA, how can I assist you today?",
+        ]
         create_guest_user_mock = mocker.patch(
-            'app.controllers.conversation.create_guest_user',
+            'app.controllers.user.create_guest_user',
             return_value=mocker.Mock(id=1)
         )
-        get_model_response_mock = mocker.patch(
-            'app.controllers.conversation.get_model_response',
-            return_value='Hello!'
-        )
 
-        conversation_controller.create_conversation()
+        response = conversation_controller.create_conversation()
+        latest_message = message_controller.get_latest_message(
+            conversation=response
+        ).to_dict()['content']
 
         create_guest_user_mock.assert_called_once()
-        get_model_response_mock.assert_called_once()
+        assert latest_message in initial_messages
 
 
 def test__create_conversation__returns_conversation_with_chat_response__when_user_is_not_guest(
@@ -26,20 +31,23 @@ def test__create_conversation__returns_conversation_with_chat_response__when_use
     mocker
 ):
     with test_app.app_context():
+        initial_messages = [
+        "Hello! How can I assist you with ALCA's AI solutions today?",
+        "Hello! How may I assist you with our AI solutions for business?",
+        "Hello! Welcome to ALCA, how can I assist you today?",
+        ]
         user = mocker.Mock(id=1)
         create_guest_user_mock = mocker.patch(
-            'app.controllers.conversation.create_guest_user',
+            'app.controllers.user.create_guest_user',
             return_value=mocker.Mock(id=1)
         )
-        get_model_response_mock = mocker.patch(
-            'app.controllers.conversation.get_model_response',
-            return_value='Hello!'
-        )
-
-        conversation_controller.create_conversation(user=user)
+        response = conversation_controller.create_conversation(user=user)
+        latest_message = message_controller.get_latest_message(
+            conversation=response
+        ).to_dict()['content']
 
         create_guest_user_mock.assert_not_called()
-        get_model_response_mock.assert_called_once()
+        assert latest_message in initial_messages
 
 
 def test__chat__returns_conversation_with_chat_response__when_conversation_is_empty(
@@ -50,7 +58,7 @@ def test__chat__returns_conversation_with_chat_response__when_conversation_is_em
         conversation = mocker.Mock()
         conversation.messages = []
         get_model_response_mock = mocker.patch(
-            'app.controllers.conversation.get_model_response',
+            'app.controllers.message.get_model_response',
             return_value='Hello!'
         )
 
@@ -70,7 +78,7 @@ def test__chat__returns_conversation_with_chat_response__when_conversation_is_no
             mocker.Mock(role='assistant', content='Hello!'),
         ]
         get_model_response_mock = mocker.patch(
-            'app.controllers.conversation.get_model_response',
+            'app.controllers.message.get_model_response',
             return_value='How are you?'
         )
 

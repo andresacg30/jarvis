@@ -22,7 +22,7 @@ stop:
 	docker-compose stop
 
 .PHONY: restart
-restart: down build up
+restart: stop build run
 
 .PHONY: docker_tag
 docker_tag:
