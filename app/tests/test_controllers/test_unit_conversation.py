@@ -8,9 +8,9 @@ def test__create_conversation__returns_conversation_with_chat_response__when_use
 ):
     with test_app.app_context():
         initial_messages = [
-        "Hello! How can I assist you with ALCA's AI solutions today?",
-        "Hello! How may I assist you with our AI solutions for business?",
-        "Hello! Welcome to ALCA, how can I assist you today?",
+            "Hello! How can I assist you with ALCA's AI solutions today?",
+            "Hello! How may I assist you with our AI solutions for business?",
+            "Hello! Welcome to ALCA, how can I assist you today?",
         ]
         create_guest_user_mock = mocker.patch(
             'app.controllers.user.create_guest_user',
@@ -32,9 +32,9 @@ def test__create_conversation__returns_conversation_with_chat_response__when_use
 ):
     with test_app.app_context():
         initial_messages = [
-        "Hello! How can I assist you with ALCA's AI solutions today?",
-        "Hello! How may I assist you with our AI solutions for business?",
-        "Hello! Welcome to ALCA, how can I assist you today?",
+            "Hello! How can I assist you with ALCA's AI solutions today?",
+            "Hello! How may I assist you with our AI solutions for business?",
+            "Hello! Welcome to ALCA, how can I assist you today?",
         ]
         user = mocker.Mock(id=1)
         create_guest_user_mock = mocker.patch(
