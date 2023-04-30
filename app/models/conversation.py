@@ -9,6 +9,7 @@ class Conversation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     messages = db.relationship("Message", lazy='dynamic')
     last_updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    is_finished = db.Column(db.Boolean, nullable=False, default=False)
 
     def add_message(self, role, content):
         message = Message(role=role, content=content, conversation_id=self.id)

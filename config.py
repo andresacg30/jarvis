@@ -15,3 +15,8 @@ class Config(object):
         IS_DEV else "sqlite:///" + os.path.join(basedir, "app.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_KEY = os.environ.get("JWT_KEY")
+    META_APP_SECRET = os.environ.get("META_APP_SECRET")
+    META_ACCESS_TOKEN = os.environ.get("META_ACCESS_TOKEN")
+    META_API_URL = os.environ.get("META_API_URL")
+    META_VERIFY_TOKEN = os.environ.get("META_VERIFY_TOKEN")
+    META_ADMIN_ID = os.environ.get("META_ADMIN_ID")
