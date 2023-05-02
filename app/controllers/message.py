@@ -35,7 +35,7 @@ def get_latest_message(conversation: Conversation) -> typing.Optional[Message]:
 
 
 def send_whatsapp_message(recipient_number: str, message: str) -> None:
-    url = current_app.config['META_API_URL'] + current_app.config['META_ADMIN_ID']+ '/messages'
+    url = current_app.config['META_API_URL'] + current_app.config['META_ADMIN_ID'] + '/messages'
     access_token = current_app.config['META_ACCESS_TOKEN']
     headers = {
         'Authorization': f'Bearer {access_token}',

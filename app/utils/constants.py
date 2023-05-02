@@ -12,5 +12,5 @@ WHATSAPP_INITIAL_MESSAGES = [
     "at a time. How can I help you?",
 ]
 TEST = [
-    "Hola {user}! Hoy estare tomando tu pedido en Peperoni RD. Cual es tu pedido?"
+    "Hola {user}!"
 ]

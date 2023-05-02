@@ -12,7 +12,7 @@ class User(db.Model):
     is_guest = db.Column(db.Boolean, nullable=False)
     phone_number = db.Column(db.String(20), nullable=True)
     origin = db.Column(db.String(20), nullable=True)
-    
+
     @hybrid_property
     def password(self):
         raise AttributeError('password is not a readable attribute')

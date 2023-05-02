@@ -1,7 +1,7 @@
 import hmac
 import hashlib
 
-from flask import Request, jsonify, request, abort, current_app
+from flask import jsonify, request, abort, current_app
 
 import app.controllers.conversation as conversation_controller
 import app.controllers.message as message_controller
@@ -95,10 +95,10 @@ def chat():
 def verify_whatsapp_request():
     challenge = request.args.get('hub.challenge')
     token = request.args.get('hub.verify_token')
-    
+
     if token == current_app.config['META_VERIFY_TOKEN']:
         return challenge
-    
+
     abort(400, "Invalid token")
 
 

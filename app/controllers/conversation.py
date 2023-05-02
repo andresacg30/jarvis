@@ -63,4 +63,3 @@ def get_last_conversation(user: User) -> typing.Optional[Conversation]:
 def finish_conversation(conversation: Conversation) -> None:
     conversation.is_finished = True
     db.session.commit()
-

@@ -23,7 +23,7 @@ class MessageHandler(DataHandlerStrategy):
             sender_number=sender_number
         )
         message_to_send = self.get_message_to_send(user=user, received_message=message_body)
-        
+
         message_controller.send_whatsapp_message(
             recipient_number=sender_number,
             message=message_to_send.content
@@ -38,7 +38,6 @@ class MessageHandler(DataHandlerStrategy):
                 origin="whatsapp"
             )
         return user
-
 
     def get_message_to_send(self, user: User, received_message: str) -> Message:
         conversation = conversation_controller.get_last_conversation(user=user)
