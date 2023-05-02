@@ -17,6 +17,10 @@ def test_app():
         BOT_INITIAL_SETUP = "bot"
         BOT_INITIAL_SETUP = "This is for test purposes"
         JWT_KEY = "test"
+        META_API_URL = "https://test.com"
+        META_ACCESS_TOKEN = "test"
+        META_ADMIN_ID = "test"
+        META_VERIFY_TOKEN = "test"
 
     flask_app = create_app(Config)
     flask_app.app_context().push()

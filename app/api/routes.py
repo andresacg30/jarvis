@@ -1,18 +1,20 @@
-from flask import Request, jsonify, request, abort, current_app
+import hmac
+import hashlib
+
+from flask import jsonify, request, abort, current_app
+
+import app.controllers.conversation as conversation_controller
+import app.controllers.message as message_controller
+import app.controllers.whatsapp as whatsapp_controller
 
 from app.api import bp
-from app.controllers import conversation as conversation_controller
-from app.controllers import message as message_controller
 from app.models import Conversation
 from app.utils import constants, security
 
 
-def _is_authenticated_get_request(request: Request) -> None:
-    api_key = request.headers.get('X-API-KEY')
-    if not api_key:
-        abort(403)
-    elif api_key != current_app.config['API_KEY']:
-        abort(401)
+data_handlers = {
+    'messages': whatsapp_controller.MessageHandler(),
+}
 
 
 @bp.errorhandler(400)
@@ -30,10 +32,26 @@ def handle_not_found_error(e):
     return jsonify(error=str(e)), 404
 
 
+def _validate_payload_signature(request):
+    signature = request.headers.get('X-Hub-Signature-256')
+    payload = request.get_data()
+    mac = hmac.new(current_app.config['META_APP_SECRET'].encode(), msg=payload, digestmod=hashlib.sha256)
+    expected_signature = f"sha256={mac.hexdigest()}"
+
+    if signature != expected_signature:
+        abort(401)
+
+
 @bp.route('/chat/initial', methods=['GET'])
 def initial_message():
-    _is_authenticated_get_request(request=request)
-    conversation = conversation_controller.create_conversation()
+    api_key = request.headers.get('X-API-KEY')
+    if not api_key:
+        abort(400, "Missing API key")
+    elif api_key != current_app.config['API_KEY']:
+        abort(401, "Invalid API key")
+    conversation = conversation_controller.create_conversation(
+        initial_messages=constants.WEB_INITIAL_MESSAGES
+    )
     last_message = message_controller.get_latest_message(conversation=conversation)
     payload = {
         "user_id": conversation.user_id,
@@ -71,3 +89,28 @@ def chat():
     conversation = conversation_controller.chat(conversation, message)
     last_message = message_controller.get_latest_message(conversation=conversation)
     return jsonify({'text': last_message.content})
+
+
+@bp.route('/chat/whatsapp', methods=["GET"])
+def verify_whatsapp_request():
+    challenge = request.args.get('hub.challenge')
+    token = request.args.get('hub.verify_token')
+
+    if token == current_app.config['META_VERIFY_TOKEN']:
+        return challenge
+
+    abort(400, "Invalid token")
+
+
+@bp.route('/chat/whatsapp', methods=["POST"])
+def handle_whatsapp_conversation():
+    _validate_payload_signature(request)
+    data = request.get_json()
+    value = data['entry'][0]['changes'][0]['value']
+    data_type = None
+    if 'messages' in value:
+        data_type = 'messages'
+    handler = data_handlers.get(data_type)
+    if handler:
+        handler.handle_data(data=value)
+    return 'OK', 200
