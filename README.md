@@ -1,2 +1,2 @@
 # jarvis
-Backend for main website.
+API for ALCA AI.
