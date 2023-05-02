@@ -27,8 +27,12 @@ def create_conversation(
     ]
     if received_message:
         messages.append(Message(role="user", content=received_message))
-    choosen_message = random.choice(initial_messages)
-    messages.append(Message(role="assistant", content=choosen_message))
+    if len(initial_messages) == 1:
+        model_response = message_controller.get_model_response(messages=messages)
+        messages.append(Message(role="assistant", content=model_response))
+    else:
+        choosen_message = random.choice(initial_messages)
+        messages.append(Message(role="assistant", content=choosen_message))
 
     for message in messages:
         message.conversation_id = conversation.id

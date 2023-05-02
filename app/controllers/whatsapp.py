@@ -18,7 +18,7 @@ class MessageHandler(DataHandlerStrategy):
         message_body = data['messages'][0]['text']['body']
         sender_number = data['messages'][0]['from']
         sender_name = data['contacts'][0]['profile']['name']
-        user = self.get_or_create_user(
+        user = self.get_or_create_user_by_phone_number(
             name=sender_name,
             sender_number=sender_number
         )
@@ -29,7 +29,7 @@ class MessageHandler(DataHandlerStrategy):
             message=message_to_send.content
         )
 
-    def get_or_create_user(self, name: str, sender_number: str) -> User:
+    def get_or_create_user_by_phone_number(self, name: str, sender_number: str) -> User:
         user = user_controller.get_user_by_phone_number(phone_number=sender_number)
         if not user:
             user = user_controller.create_user(
@@ -42,7 +42,7 @@ class MessageHandler(DataHandlerStrategy):
 
     def get_message_to_send(self, user: User, received_message: str) -> Message:
         conversation = conversation_controller.get_last_conversation(user=user)
-        if conversation and conversation.last_updated < datetime.datetime.utcnow() - datetime.timedelta(minutes=1):
+        if conversation and conversation.last_updated < datetime.datetime.utcnow() - datetime.timedelta(hours=12):
             conversation_controller.finish_conversation(conversation=conversation)
         if not conversation or conversation.is_finished:
             chat = conversation_controller.create_conversation(
