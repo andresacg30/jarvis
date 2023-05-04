@@ -18,7 +18,7 @@ def get_model_response(messages: typing.List[Message]) -> str:
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[message.to_dict() for message in messages],
-        temperature=1.5,
+        temperature=0.7,
     )
     model_response = response['choices'][0]['message']['content']
     return model_response
