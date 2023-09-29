@@ -60,45 +60,45 @@ An interactive chatbot API built using Flask and OpenAI's GPT model. The applica
 ## Setup & Installation
 
 Clone the Repository:
-`
+```
 git clone https://github.com/andresacg30/jarvis
 cd jarvis
-`
+```
 Build Docker Image:
 
-`
+```
 make build
-`
+```
 Run the Application:
-`
+```
 make run
-`
+```
 Stop the Application:
-`
+```
 make stop
-`
+```
 Restart the Application:
-`
+```
 make restart
-`
+```
 Clean Database:
-`
+```
 make clean_db
-`
+```
 Initialize Database:
-`
+```
 make init_db
-`
+```
 Tag Docker Image:
-`
+```
 make docker_tag
-`
+```
 
 ## Testing
 To run tests, execute:
-`
+```
 pytest
-`
+```
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
