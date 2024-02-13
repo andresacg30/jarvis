@@ -6,6 +6,7 @@ from flask import jsonify, request, abort, current_app
 import app.controllers.conversation as conversation_controller
 import app.controllers.message as message_controller
 import app.controllers.whatsapp as whatsapp_controller
+import app.controllers.lead as lead_controller
 
 from app.api import bp
 from app.models import Conversation
@@ -42,24 +43,37 @@ def _validate_payload_signature(request):
         abort(401)
 
 
-@bp.route('/chat/initial', methods=['GET'])
+@bp.route('/chat/initial', methods=['POST'])
 def initial_message():
+    data = request.get_json() or {}
     api_key = request.headers.get('X-API-KEY')
     if not api_key:
         abort(400, "Missing API key")
     elif api_key != current_app.config['API_KEY']:
         abort(401, "Invalid API key")
+    lead = lead_controller.get_lead_by_email(data.get('email'))
+    if not lead:
+        lead = lead_controller.create_lead(
+            name=data.get('name'),
+            email=data.get('email'),
+            phone_number=data.get('phone_number'),
+            birthday=data.get('birthday'),
+            have_iul=data.get('have_iul'),
+            primary_goal=data.get('primary_goal'),
+            state=data.get('state'),
+            campaign=data.get('campaign')
+        )
     conversation = conversation_controller.create_conversation(
-        initial_messages=constants.WEB_INITIAL_MESSAGES
+        lead=lead,
     )
     last_message = message_controller.get_latest_message(conversation=conversation)
     payload = {
-        "user_id": conversation.user_id,
+        "lead_id": conversation.lead_id,
         "conversation_id": conversation.id,
     }
     token = security.encode_jwt_tokens(
         payload=payload,
-        days_before_expiration=constants.GUEST_USER_TOKEN_DAYS_BEFORE_EXPIRATION,
+        days_before_expiration=constants.TOKEN_DAYS_BEFORE_EXPIRATION,
         secret_key=current_app.config['JWT_KEY'],
         encryption_algorithm=constants.JWT_ALGORITHM
     )
@@ -80,10 +94,10 @@ def chat():
             secret_key=current_app.config['JWT_KEY'],
             encryption_algorithm=constants.JWT_ALGORITHM
         )
-        user_id = token['user_id']
+        lead_id = token['lead_id']
     except (security.TokenError):
         abort(401, "Invalid token")
-    conversation = Conversation.query.filter_by(user_id=user_id).first()
+    conversation = Conversation.query.filter_by(lead_id=lead_id).first()
     if not conversation:
         abort(404, "Conversation not found")
     conversation = conversation_controller.chat(conversation, message)

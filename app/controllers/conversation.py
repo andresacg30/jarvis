@@ -1,38 +1,34 @@
 import datetime
 import typing
-import random
 
 from flask import current_app
 
-import app.controllers.user as user_controller
 import app.controllers.message as message_controller
+import app.controllers.lead as lead_controller
 
 from app import db
-from app.models import Conversation, Message, User
+from app.models import Conversation, Message, Lead
 
 
 def create_conversation(
-    initial_messages: list,
-    received_message: str = None,
-    user: User = None
+    lead: Lead,
+    message_received: str = None
 ) -> Conversation:
-    if not user:
-        user = user_controller.create_guest_user()
-    conversation = Conversation(user_id=user.id)
+
+    conversation = Conversation(lead_id=lead.id)
     db.session.add(conversation)
     db.session.commit()
 
+    lead_setup = lead_controller.get_lead_setup(lead)
     messages = [
         Message(role="system", content=current_app.config['BOT_INITIAL_SETUP']),
     ]
-    if received_message:
-        messages.append(Message(role="user", content=received_message))
-    if len(initial_messages) == 1:
-        model_response = message_controller.get_model_response(messages=messages)
-        messages.append(Message(role="assistant", content=model_response))
+    if message_received:
+        messages.append(Message(role="user", content=message_received))
     else:
-        choosen_message = random.choice(initial_messages)
-        messages.append(Message(role="assistant", content=choosen_message))
+        messages.append(Message(role="assistant", content=lead_setup))
+    model_response = message_controller.get_model_response(messages=messages)
+    messages.append(Message(role="assistant", content=model_response))
 
     for message in messages:
         message.conversation_id = conversation.id
@@ -56,8 +52,8 @@ def chat(
     return conversation
 
 
-def get_last_conversation(user: User) -> typing.Optional[Conversation]:
-    return Conversation.query.filter_by(user_id=user.id).order_by(Conversation.id.desc()).first() or None
+def get_last_conversation(lead: Lead) -> typing.Optional[Conversation]:
+    return Conversation.query.filter_by(lead_id=lead.id).order_by(Conversation.id.desc()).first() or None
 
 
 def finish_conversation(conversation: Conversation) -> None:

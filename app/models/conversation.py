@@ -6,7 +6,7 @@ from .message import Message
 
 class Conversation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead.id'))
     messages = db.relationship("Message", lazy='dynamic')
     last_updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     is_finished = db.Column(db.Boolean, nullable=False, default=False)

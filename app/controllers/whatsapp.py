@@ -46,7 +46,7 @@ class MessageHandler(DataHandlerStrategy):
         if not conversation or conversation.is_finished:
             chat = conversation_controller.create_conversation(
                 initial_messages=constants.WHATSAPP_INITIAL_MESSAGES,
-                received_message=received_message,
+                message_received=received_message,
                 user=user
             )
         else:

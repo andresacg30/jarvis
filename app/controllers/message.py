@@ -1,11 +1,12 @@
 import typing
 import requests
 
-import openai
-
+from openai import OpenAI
 from flask import current_app
 
 from app.models import Message, Conversation
+
+client = OpenAI()
 
 
 class ModelResponseError(Exception):
@@ -15,12 +16,11 @@ class ModelResponseError(Exception):
 
 
 def get_model_response(messages: typing.List[Message]) -> str:
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[message.to_dict() for message in messages],
-        temperature=0.7,
     )
-    model_response = response['choices'][0]['message']['content']
+    model_response = response.choices[0].message.content
     return model_response
 
 
