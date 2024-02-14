@@ -6,7 +6,7 @@ An interactive chatbot API built using Flask and OpenAI's GPT model. The applica
 - Real-time chat interface.
 - Conversations stored in a structured database.
 - Continuous Integration and Continuous Deployment (CI/CD) pipelines.
-- Test-Driven Development (TDD) approach.
+- Test-Driven Development (TDD) approach.j
 - Dockerized application for consistent development and deployment.
 
 ## Tools & Technologies
