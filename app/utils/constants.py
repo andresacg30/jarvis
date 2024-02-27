@@ -1,4 +1,4 @@
-TOKEN_DAYS_BEFORE_EXPIRATION = 1
+TOKEN_DAYS_BEFORE_EXPIRATION = 10
 JWT_ALGORITHM = 'HS256'
 WEB_INITIAL_MESSAGES = [
     "Were you looking to build cash value, plan for retirement or just get basic cov",
