@@ -107,7 +107,7 @@ def chat():
     return jsonify({'text': last_message.content})
 
 
-@bp.route('/chat/chat/assistant', methods=["POST"])
+@bp.route('/chat/assistant', methods=["POST"])
 def chat_assistant():
     data = request.get_json() or {}
     token = data.get('token')
