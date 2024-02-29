@@ -22,7 +22,7 @@ def create_conversation(
 
     lead_setup = lead_controller.get_lead_setup(lead)
     messages = [
-        Message(role="system", content=settings),
+        Message(role="system", content=settings)
     ]
     if message_received:
         messages.append(Message(role="user", content=message_received))
