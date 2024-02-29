@@ -12,6 +12,7 @@ from app.models import Conversation, Message, Lead
 
 def create_conversation(
     lead: Lead,
+    settings: str,
     message_received: str = None
 ) -> Conversation:
 
@@ -21,7 +22,7 @@ def create_conversation(
 
     lead_setup = lead_controller.get_lead_setup(lead)
     messages = [
-        Message(role="system", content=current_app.config['BOT_INITIAL_SETUP']),
+        Message(role="system", content=settings),
     ]
     if message_received:
         messages.append(Message(role="user", content=message_received))
@@ -44,6 +45,19 @@ def chat(
     message: typing.Optional[Message]
 ) -> Conversation:
     conversation.add_message(role="user", content=message)
+    model_response = message_controller.get_model_response(messages=conversation.messages)
+    conversation.add_message(role="assistant", content=model_response)
+    conversation.last_updated = datetime.datetime.utcnow()
+    db.session.commit()
+
+    return conversation
+
+
+def chat_assistant(
+    conversation: Conversation,
+    message: typing.Optional[Message]
+) -> Conversation:
+    conversation.add_message(role="system", content=message)
     model_response = message_controller.get_model_response(messages=conversation.messages)
     conversation.add_message(role="assistant", content=model_response)
     conversation.last_updated = datetime.datetime.utcnow()

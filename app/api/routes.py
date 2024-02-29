@@ -63,8 +63,9 @@ def initial_message():
             state=data.get('state'),
             campaign=data.get('campaign')
         )
+    settings = data.get('settings')
     conversation = conversation_controller.create_conversation(
-        lead=lead,
+        lead=lead, settings=settings
     )
     last_message = message_controller.get_latest_message(conversation=conversation)
     payload = {
@@ -101,6 +102,30 @@ def chat():
     if not conversation:
         abort(404, "Conversation not found")
     conversation = conversation_controller.chat(conversation, message)
+    last_message = message_controller.get_latest_message(conversation=conversation)
+    return jsonify({'text': last_message.content})
+
+
+@bp.route('/chat/chat/assistant', methods=["POST"])
+def chat_assistant():
+    data = request.get_json() or {}
+    token = data.get('token')
+    message = data.get('content')
+    if not token:
+        abort(400, "Missing token")
+    try:
+        token = security.decode_jwt_tokens(
+            token=token,
+            secret_key=current_app.config['JWT_KEY'],
+            encryption_algorithm=constants.JWT_ALGORITHM
+        )
+        conversation_id = token['conversation_id']
+    except (security.TokenError):
+        abort(401, "Invalid token")
+    conversation = Conversation.query.filter_by(id=conversation_id).first()
+    if not conversation:
+        abort(404, "Conversation not found")
+    conversation = conversation_controller.chat_assistant(conversation, message)
     last_message = message_controller.get_latest_message(conversation=conversation)
     return jsonify({'text': last_message.content})
 
