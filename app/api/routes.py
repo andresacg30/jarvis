@@ -54,13 +54,12 @@ def initial_message():
     elif api_key != current_app.config['API_KEY']:
         abort(401, "Invalid API key")
     lead = lead_controller.get_lead_by_email(data.get('email'))
-    lead_birthday = data.get('birthday') if data.get('birthday') != "null" else None
     if not lead:
         lead = lead_controller.create_lead(
             name=data.get('name'),
             email=data.get('email'),
             phone_number=data.get('phone_number'),
-            birthday=lead_birthday,
+            birthday=data.get('birthday'),
             have_iul=data.get('have_iul'),
             primary_goal=data.get('primary_goal'),
             state=data.get('state'),

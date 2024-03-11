@@ -17,7 +17,7 @@ def create_lead(
     campaign: str,
     lead_type: str
 ) -> Lead:
-    date = datetime.datetime.strptime(birthday, "%Y-%m-%d")
+    date = datetime.datetime.strptime(birthday, "%Y-%m-%d") if birthday != "null" else None
     lead = Lead(
         name=name,
         email=email,
