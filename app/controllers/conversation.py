@@ -1,10 +1,8 @@
 import datetime
 import typing
 
-from flask import current_app
 
 import app.controllers.message as message_controller
-import app.controllers.lead as lead_controller
 
 from app import db
 from app.models import Conversation, Message, Lead
@@ -13,6 +11,7 @@ from app.models import Conversation, Message, Lead
 def create_conversation(
     lead: Lead,
     settings: str,
+    lead_setup: str,
     message_received: str = None
 ) -> Conversation:
 
@@ -20,7 +19,6 @@ def create_conversation(
     db.session.add(conversation)
     db.session.commit()
 
-    lead_setup = lead_controller.get_lead_setup(lead)
     messages = [
         Message(role="system", content=settings)
     ]

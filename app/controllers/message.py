@@ -17,7 +17,7 @@ class ModelResponseError(Exception):
 
 def get_model_response(messages: typing.List[Message]) -> str:
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[message.to_dict() for message in messages],
     )
     model_response = response.choices[0].message.content

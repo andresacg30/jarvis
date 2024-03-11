@@ -1,3 +1,4 @@
+import datetime
 import typing
 
 from app import db
@@ -13,17 +14,20 @@ def create_lead(
     have_iul: bool,
     primary_goal: str,
     state: str,
-    campaign: str
+    campaign: str,
+    lead_type: str
 ) -> Lead:
+    date = datetime.datetime.strptime(birthday, "%Y-%m-%d")
     lead = Lead(
         name=name,
         email=email,
         phone_number=phone_number,
-        birthday=birthday,
+        birthday=date,
         have_iul=have_iul,
         primary_goal=primary_goal,
         state=state,
-        campaign=campaign
+        campaign=campaign,
+        lead_type=lead_type
     )
     db.session.add(lead)
     db.session.commit()

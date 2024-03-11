@@ -1,5 +1,7 @@
 import hmac
 import hashlib
+from pathlib import Path
+from openai import OpenAI
 
 from flask import jsonify, request, abort, current_app
 
@@ -62,11 +64,13 @@ def initial_message():
             have_iul=data.get('have_iul'),
             primary_goal=data.get('primary_goal'),
             state=data.get('state'),
-            campaign=data.get('campaign')
+            campaign=data.get('campaign'),
+            lead_type=data.get('lead_type')
         )
     settings = data.get('settings')
+    lead_setup = data.get('lead_setup')
     conversation = conversation_controller.create_conversation(
-        lead=lead, settings=settings
+        lead=lead, settings=settings, lead_setup=lead_setup
     )
     last_message = message_controller.get_latest_message(conversation=conversation)
     payload = {
@@ -154,3 +158,16 @@ def handle_whatsapp_conversation():
     if handler:
         handler.handle_data(data=value)
     return 'OK', 200
+
+
+@bp.route("/voice", methods=["POST"])
+def generate_voice_message():
+    client = OpenAI()
+    speech_file_path = Path(__file__).parent / "speecsd.mp3"
+    voice = client.audio.speech.create(
+        model="tts-1",
+        voice="alloy",
+        input="U don't recognize me? I'm jarvis, the new chick."
+    )
+
+    voice.stream_to_file(speech_file_path)
