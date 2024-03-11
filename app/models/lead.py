@@ -9,6 +9,6 @@ class Lead(db.Model):
     birthday = db.Column(db.Date, nullable=True)
     have_iul = db.Column(db.Boolean, nullable=True)
     primary_goal = db.Column(db.String(100), nullable=True)
-    state = db.Column(db.String(10), nullable=True)
+    state = db.Column(db.String(20), nullable=True)
     campaign = db.Column(db.String(20), nullable=True)
     lead_type = db.Column(db.String(20), nullable=True)
