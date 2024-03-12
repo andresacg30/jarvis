@@ -134,6 +134,18 @@ def chat_assistant():
     return jsonify({'text': last_message.content})
 
 
+@bp.route('/chat/assistant/notification', methods=["POST"])
+def notification():
+    try:
+        data = request.get_json() or {}
+        message = data.get('content')
+        conversation = conversation_controller.get_notification_message(message)
+        last_message = message_controller.get_latest_message(conversation=conversation)
+        return jsonify({'text': last_message.content})
+    except lead_controller.LeadNotFoundError:
+        abort(404, "Lead not found")
+
+
 @bp.route('/chat/whatsapp', methods=["GET"])
 def verify_whatsapp_request():
     challenge = request.args.get('hub.challenge')

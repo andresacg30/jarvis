@@ -5,6 +5,15 @@ from app import db
 from app.models import Lead
 from app.utils import constants
 
+import app.controllers.message as message_controller
+from app.models import Message
+
+
+class LeadNotFoundError(Exception):
+    """
+    Raised if lead is not found.
+    """
+
 
 def create_lead(
     name: str,
@@ -48,3 +57,19 @@ def get_lead_setup(lead: Lead) -> str:
 
 def get_lead_by_email(email: str) -> typing.Optional[Lead]:
     return Lead.query.filter_by(email=email).first()
+
+
+def get_lead_by_name(name: str) -> typing.Optional[Lead]:
+    return Lead.query.filter_by(name=name).first()
+
+
+def find_lead_by_message(message: str) -> typing.Optional[Lead]:
+    prompt = f"Extract the name from this message: {message}. Only return the name without quotation marks."
+    messages = [
+        Message(role="system", content=prompt)
+    ]
+    find_lead = message_controller.get_model_response(messages=messages)
+    lead = get_lead_by_name(find_lead)
+    if not lead:
+        raise LeadNotFoundError(f"Lead with name {find_lead} not found")
+    return lead
