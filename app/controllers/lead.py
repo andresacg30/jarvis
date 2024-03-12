@@ -63,6 +63,10 @@ def get_lead_by_name(name: str) -> typing.Optional[Lead]:
     return Lead.query.filter_by(name=name).first()
 
 
+def get_lead_by_id(lead_id: int) -> typing.Optional[Lead]:
+    return Lead.query.get(lead_id)
+
+
 def find_lead_by_message(message: str) -> typing.Optional[Lead]:
     prompt = f"Extract the name from this message: {message}. Only return the name without quotation marks."
     messages = [

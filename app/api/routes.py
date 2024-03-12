@@ -140,8 +140,9 @@ def notification():
         data = request.get_json() or {}
         message = data.get('content')
         conversation = conversation_controller.get_notification_message(message)
+        lead = lead_controller.get_lead_by_id(conversation.lead_id)
         last_message = message_controller.get_latest_message(conversation=conversation)
-        return jsonify({'text': last_message.content})
+        return jsonify({'text': last_message.content, 'lead': lead.email})
     except lead_controller.LeadNotFoundError:
         abort(404, "Lead not found")
 
