@@ -1,4 +1,5 @@
 import datetime
+import logging
 import typing
 
 from app import db
@@ -73,6 +74,7 @@ def find_lead_by_message(message: str) -> typing.Optional[Lead]:
         Message(role="system", content=prompt)
     ]
     find_lead = message_controller.get_model_response(messages=messages)
+    logging.info(f"Found lead: {find_lead}, endpoint: chat/assistant/notification")
     lead = get_lead_by_name(find_lead)
     if not lead:
         raise LeadNotFoundError(f"Lead with name {find_lead} not found")
