@@ -69,7 +69,7 @@ def get_notification_message(message: str) -> str:
     lead = lead_controller.find_lead_by_message(message)
     last_conversation = get_last_conversation(lead=lead)
     reminder_message = f"This is a reminder I get from this user Insurance's application status. Create a follow up message with this reminder: {message}.\
-        Don't say anything about message and data rates, or don't tell them to send STOP."
+        Don't say anything about message and data rates, or don't tell them to send STOP. Send the link that is in the message."
     last_conversation.add_message(role="system", content=reminder_message)
     notifcation_message = message_controller.get_model_response(messages=last_conversation.messages)
     last_conversation.add_message(role="assistant", content=notifcation_message)
