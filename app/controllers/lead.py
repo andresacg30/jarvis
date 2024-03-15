@@ -25,7 +25,8 @@ def create_lead(
     primary_goal: str,
     state: str,
     campaign: str,
-    lead_type: str
+    lead_type: str,
+    other_fields: typing.Optional[dict] = None
 ) -> Lead:
     try:
         date = datetime.datetime.strptime(birthday, "%Y-%m-%d") if birthday != "null" else None
@@ -40,7 +41,8 @@ def create_lead(
         primary_goal=primary_goal,
         state=state,
         campaign=campaign,
-        lead_type=lead_type
+        lead_type=lead_type,
+        other_fields=other_fields
     )
     db.session.add(lead)
     db.session.commit()

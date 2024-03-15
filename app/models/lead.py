@@ -12,3 +12,4 @@ class Lead(db.Model):
     state = db.Column(db.String(20), nullable=True)
     campaign = db.Column(db.String(20), nullable=True)
     lead_type = db.Column(db.String(20), nullable=True)
+    other_fields = db.Column(db.JSON, nullable=True)

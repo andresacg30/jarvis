@@ -64,7 +64,8 @@ def initial_message():
             primary_goal=data.get('primary_goal'),
             state=data.get('state'),
             campaign=data.get('campaign'),
-            lead_type=data.get('lead_type')
+            lead_type=data.get('lead_type'),
+            other_fields=data.get('other_fields')
         )
     settings = data.get('settings')
     lead_setup = data.get('lead_setup')
