@@ -72,7 +72,7 @@ def get_notification_message(message: str) -> str:
     last_conversation = get_last_conversation(lead=lead)
     reminder_message = f"This is a reminder message I get from this user Insurance's application status. Create a follow up message \
         with this reminder: {message}. Don't say anything about message and data rates, or don't tell them to send STOP. Send the link \
-            that is in the reminder message for payment portal if the client has to pay. If not, send them the booking link. We have to make \
+            that is in the reminder message for payment portal ONLY if the client is missing to pay. If not, send them the booking link. We have to make \
                 them continue their application, so use anything that you see in that reminder message that can work."
     last_conversation.add_message(role="system", content=reminder_message)
     notifcation_message = message_controller.get_model_response(messages=last_conversation.messages)
