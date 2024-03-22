@@ -23,8 +23,6 @@ def create_conversation(
     messages = [
         Message(role="system", content=settings)
     ]
-    if lead.other_fields:
-        messages.append(Message(role="system", content=f"This is some metadata for the lead: {lead.other_fields}"))
     if message_received:
         messages.append(Message(role="user", content=message_received))
     else:
