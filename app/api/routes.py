@@ -148,6 +148,17 @@ def notification():
         abort(404, "Lead not found")
 
 
+@bp.route('/chat/assistant/internal', methods=["POST"])
+def internal():
+    try:
+        data = request.get_json() or {}
+        message = data.get('content')
+        response = conversation_controller.get_internal_message(message)
+        return jsonify({'text': response})
+    except lead_controller.LeadNotFoundError:
+        abort(404, "Lead not found")
+
+
 @bp.route('/chat/whatsapp', methods=["GET"])
 def verify_whatsapp_request():
     challenge = request.args.get('hub.challenge')

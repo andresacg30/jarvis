@@ -9,8 +9,8 @@ from flask_migrate import Migrate
 from config import Config
 
 
-client = google.cloud.logging.Client()
-client.setup_logging()
+# client = google.cloud.logging.Client()
+# client.setup_logging()
 db = SQLAlchemy()
 migrate = Migrate()
 

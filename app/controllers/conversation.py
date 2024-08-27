@@ -80,6 +80,12 @@ def get_notification_message(message: str) -> str:
     return last_conversation
 
 
+def get_internal_message(message: str) -> str:
+    notifcation_message = message_controller.get_model_response(messages=[Message(role="system", content=message)])
+
+    return notifcation_message
+
+
 def get_last_conversation(lead: Lead) -> typing.Optional[Conversation]:
     return Conversation.query.filter_by(lead_id=lead.id).order_by(Conversation.id.desc()).first() or None
 
