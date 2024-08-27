@@ -26,7 +26,7 @@ def create_conversation(
     if message_received:
         messages.append(Message(role="user", content=message_received))
     else:
-        messages.append(Message(role="assistant", content=lead_setup))
+        messages.append(Message(role="system", content=lead_setup))
     model_response = message_controller.get_model_response(messages=messages)
     messages.append(Message(role="assistant", content=model_response))
 
